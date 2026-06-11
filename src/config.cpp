@@ -1,4 +1,4 @@
-#include "config.h"
+#include "config.hpp"
 #include <shlwapi.h>
 
 static std::wstring GetConfigFilePath() {

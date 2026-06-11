@@ -3,9 +3,9 @@
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <string>
-#include "resource.h"
-#include "config.h"
-#include "injector.h"
+#include "resource.hpp"
+#include "config.hpp"
+#include "injector.hpp"
 
 // Link standard Windows libraries
 #pragma comment(lib, "comctl32.lib")
