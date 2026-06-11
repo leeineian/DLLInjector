@@ -212,7 +212,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_btnInject = CreateWindowExW(
                 0, L"BUTTON", L"Inject",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,
-                10, 10, 120, 35,
+                10, 10, 100, 35,
                 hwnd, (HMENU)IDC_BTN_INJECT, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -220,7 +220,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_btnHide = CreateWindowExW(
                 0, L"BUTTON", L"Hide Menu",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
-                10, 50, 120, 22,
+                10, 50, 100, 22,
                 hwnd, (HMENU)IDC_BTN_HIDE, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -236,7 +236,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_editTarget = CreateWindowExW(
                 WS_EX_CLIENTEDGE, L"EDIT", L"minecraft.windows.exe",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL,
-                140, 10, 235, 22,
+                120, 10, 165, 22,
                 hwnd, (HMENU)IDC_EDIT_TARGET, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -244,7 +244,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_chkCustom = CreateWindowExW(
                 0, L"BUTTON", L"Custom Target",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
-                140, 35, 235, 20,
+                120, 35, 165, 20,
                 hwnd, (HMENU)IDC_CHK_CUSTOM, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -252,7 +252,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_chkAuto = CreateWindowExW(
                 0, L"BUTTON", L"Auto Inject",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_AUTOCHECKBOX,
-                140, 55, 110, 20,
+                120, 55, 90, 20,
                 hwnd, (HMENU)IDC_CHK_AUTO, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -260,7 +260,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_editDelay = CreateWindowExW(
                 WS_EX_CLIENTEDGE, L"EDIT", L"5",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | ES_NUMBER | ES_CENTER,
-                250, 55, 30, 22,
+                215, 55, 25, 22,
                 hwnd, (HMENU)IDC_EDIT_DELAY, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
             SendMessageW(g_editDelay, EM_LIMITTEXT, 2, 0);
@@ -269,7 +269,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             HWND hDelayLabel = CreateWindowExW(
                 0, L"STATIC", L"s delay",
                 WS_VISIBLE | WS_CHILD,
-                285, 57, 90, 20,
+                242, 57, 43, 20,
                 hwnd, nullptr, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
@@ -277,14 +277,14 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             g_editPath = CreateWindowExW(
                 WS_EX_CLIENTEDGE, L"EDIT", L"Click \"Select\" to select the dll file",
                 WS_TABSTOP | WS_VISIBLE | WS_CHILD | ES_AUTOHSCROLL | ES_READONLY,
-                75, 77, 300, 22,
+                75, 77, 210, 22,
                 hwnd, (HMENU)IDC_EDIT_PATH, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
 
             // Status bar
             g_statusBar = CreateWindowExW(
                 0, STATUSCLASSNAMEW, nullptr,
-                WS_CHILD | WS_VISIBLE | SBARS_SIZEGRIP,
+                WS_CHILD | WS_VISIBLE,
                 0, 0, 0, 0,
                 hwnd, (HMENU)IDC_STATUSBAR, ((LPCREATESTRUCTW)lParam)->hInstance, nullptr
             );
@@ -457,7 +457,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     }
 
     // Adjust window size to fit client area exactly
-    RECT rc = { 0, 0, 395, 130 }; // client width=395, height=130 (leaving room for statusbar)
+    RECT rc = { 0, 0, 295, 125 }; // client width=295, height=125 (leaving room for statusbar)
     AdjustWindowRectEx(&rc, WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX, FALSE, 0);
 
     HWND hwnd = CreateWindowExW(
