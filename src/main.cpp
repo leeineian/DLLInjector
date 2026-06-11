@@ -3,7 +3,6 @@
 #include <shellapi.h>
 #include <shlwapi.h>
 #include <string>
-#include "resource.hpp"
 #include "config.hpp"
 #include "injector.hpp"
 
@@ -71,10 +70,7 @@ void InitTrayIcon(HWND hwnd) {
     g_nid.uID = 1;
     g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     g_nid.uCallbackMessage = WM_TRAYICON;
-    g_nid.hIcon = LoadIconW(GetModuleHandleW(nullptr), MAKEINTRESOURCEW(IDI_APP_ICON));
-    if (!g_nid.hIcon) {
-        g_nid.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
-    }
+    g_nid.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
     wcscpy_s(g_nid.szTip, L"DLL Injector - Double-click to show");
     Shell_NotifyIconW(NIM_ADD, &g_nid);
 }
@@ -443,10 +439,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
-    wc.hIcon = LoadIconW(hInstance, MAKEINTRESOURCEW(IDI_APP_ICON));
-    if (!wc.hIcon) {
-        wc.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
-    }
+    wc.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wc.lpszClassName = L"DLLInjectorWindowClass";
