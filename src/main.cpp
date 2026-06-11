@@ -43,6 +43,8 @@ HWND g_editDelay = nullptr;
 HWND g_editPath = nullptr;
 HWND g_statusBar = nullptr;
 HFONT g_hFont = nullptr;
+HICON g_hAppIconLarge = nullptr;
+HICON g_hAppIconSmall = nullptr;
 
 // State management
 AppConfig g_config;
@@ -70,7 +72,7 @@ void InitTrayIcon(HWND hwnd) {
     g_nid.uID = 1;
     g_nid.uFlags = NIF_ICON | NIF_MESSAGE | NIF_TIP;
     g_nid.uCallbackMessage = WM_TRAYICON;
-    g_nid.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
+    g_nid.hIcon = g_hAppIconSmall;
     wcscpy_s(g_nid.szTip, L"DLL Injector - Double-click to show");
     Shell_NotifyIconW(NIM_ADD, &g_nid);
 }
@@ -418,6 +420,12 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             if (g_hFont) {
                 DeleteObject(g_hFont);
             }
+            if (g_hAppIconLarge) {
+                DestroyIcon(g_hAppIconLarge);
+            }
+            if (g_hAppIconSmall) {
+                DestroyIcon(g_hAppIconSmall);
+            }
             PostQuitMessage(0);
             break;
         }
@@ -434,12 +442,28 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
     icex.dwICC = ICC_WIN95_CLASSES | ICC_BAR_CLASSES;
     InitCommonControlsEx(&icex);
 
+    // Load professional Windows stock security shield icon
+    SHSTOCKICONINFO siiLarge = { sizeof(siiLarge) };
+    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_ICON | SHGSI_LARGEICON, &siiLarge))) {
+        g_hAppIconLarge = siiLarge.hIcon;
+    } else {
+        g_hAppIconLarge = LoadIconW(nullptr, IDI_APPLICATION);
+    }
+
+    SHSTOCKICONINFO siiSmall = { sizeof(siiSmall) };
+    if (SUCCEEDED(SHGetStockIconInfo(SIID_SHIELD, SHGSI_ICON | SHGSI_SMALLICON, &siiSmall))) {
+        g_hAppIconSmall = siiSmall.hIcon;
+    } else {
+        g_hAppIconSmall = LoadIconW(nullptr, IDI_APPLICATION);
+    }
+
     WNDCLASSEXW wc = { 0 };
     wc.cbSize = sizeof(WNDCLASSEXW);
     wc.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
     wc.lpfnWndProc = WndProc;
     wc.hInstance = hInstance;
-    wc.hIcon = LoadIconW(nullptr, IDI_APPLICATION);
+    wc.hIcon = g_hAppIconLarge;
+    wc.hIconSm = g_hAppIconSmall;
     wc.hCursor = LoadCursorW(nullptr, IDC_ARROW);
     wc.hbrBackground = (HBRUSH)(COLOR_3DFACE + 1);
     wc.lpszClassName = L"DLLInjectorWindowClass";
