@@ -338,7 +338,6 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 SetWindowTextW(g_editPath, g_config.dllPath.c_str());
             }
 
-            SetTimer(hwnd, TIMER_UIUPDATE, 500, nullptr);
             UpdateControlsState(hwnd);
             InitTrayIcon(hwnd);
             break;
@@ -456,8 +455,23 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             SetBkMode(hdcStatic, TRANSPARENT);
             return (INT_PTR)GetSysColorBrush(COLOR_3DFACE);
         }
+        case WM_SHOWWINDOW: {
+            if (wParam) {
+                SetTimer(hwnd, TIMER_UIUPDATE, 500, nullptr);
+            } else {
+                KillTimer(hwnd, TIMER_UIUPDATE);
+            }
+            break;
+        }
         case WM_SIZE: {
             SendMessageW(g_statusBar, WM_SIZE, 0, 0);
+            if (wParam == SIZE_MINIMIZED) {
+                KillTimer(hwnd, TIMER_UIUPDATE);
+            } else if (wParam == SIZE_RESTORED || wParam == SIZE_MAXIMIZED) {
+                if (IsWindowVisible(hwnd)) {
+                    SetTimer(hwnd, TIMER_UIUPDATE, 500, nullptr);
+                }
+            }
             break;
         }
         case WM_CLOSE: {
