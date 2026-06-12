@@ -25,6 +25,7 @@
 #define IDC_STATUSBAR        1009
 
 #define TIMER_AUTOINJECT     1
+#define TIMER_UIUPDATE       2
 #define WM_TRAYICON          (WM_USER + 1)
 
 // Tray Context Menu IDs
@@ -114,6 +115,29 @@ void SelectDLL(HWND hwnd) {
     if (GetOpenFileNameW(&ofn)) {
         g_config.dllPath = szFile;
         SetWindowTextW(g_editPath, szFile);
+    }
+}
+
+void LaunchTarget(HWND hwnd) {
+    wchar_t szProcName[MAX_PATH];
+    GetWindowTextW(g_editTarget, szProcName, MAX_PATH);
+    std::wstring target = szProcName;
+    if (target.empty()) return;
+
+    SendMessageW(g_statusBar, SB_SETTEXTW, 0, (LPARAM)L"Launching target...");
+
+    HINSTANCE hInst = nullptr;
+    if (_wcsicmp(target.c_str(), L"minecraft.windows.exe") == 0) {
+        hInst = ShellExecuteW(nullptr, L"open", L"minecraft:", nullptr, nullptr, SW_SHOWNORMAL);
+    } else {
+        hInst = ShellExecuteW(nullptr, L"open", target.c_str(), nullptr, nullptr, SW_SHOWNORMAL);
+    }
+
+    if ((INT_PTR)hInst <= 32) {
+        std::wstring errMsg = L"Failed to launch: " + target;
+        SendMessageW(g_statusBar, SB_SETTEXTW, 0, (LPARAM)errMsg.c_str());
+    } else {
+        SendMessageW(g_statusBar, SB_SETTEXTW, 0, (LPARAM)L"Target launched successfully.");
     }
 }
 
@@ -314,6 +338,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                 SetWindowTextW(g_editPath, g_config.dllPath.c_str());
             }
 
+            SetTimer(hwnd, TIMER_UIUPDATE, 500, nullptr);
             UpdateControlsState(hwnd);
             InitTrayIcon(hwnd);
             break;
@@ -322,9 +347,16 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
             int wmId = LOWORD(wParam);
             switch (wmId) {
                 case IDC_BTN_INJECT:
-                case IDM_TRAY_INJECT:
-                    PerformManualInjection(hwnd);
+                case IDM_TRAY_INJECT: {
+                    wchar_t currentBtnText[32];
+                    GetWindowTextW(g_btnInject, currentBtnText, 32);
+                    if (wcscmp(currentBtnText, L"Launch") == 0) {
+                        LaunchTarget(hwnd);
+                    } else {
+                        PerformManualInjection(hwnd);
+                    }
                     break;
+                }
                 case IDC_BTN_HIDE:
                     HideToTray(hwnd);
                     break;
@@ -375,6 +407,24 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
                         SendMessageW(g_statusBar, SB_SETTEXTW, 0, (LPARAM)L"AutoInject: Injection failed!");
                     }
                 }
+            } else if (wParam == TIMER_UIUPDATE) {
+                wchar_t szProcName[MAX_PATH];
+                GetWindowTextW(g_editTarget, szProcName, MAX_PATH);
+                std::wstring target = szProcName;
+                if (!target.empty()) {
+                    DWORD procId = GetProcId(target);
+                    wchar_t currentBtnText[32];
+                    GetWindowTextW(g_btnInject, currentBtnText, 32);
+                    if (procId != 0) {
+                        if (wcscmp(currentBtnText, L"Inject") != 0) {
+                            SetWindowTextW(g_btnInject, L"Inject");
+                        }
+                    } else {
+                        if (wcscmp(currentBtnText, L"Launch") != 0) {
+                            SetWindowTextW(g_btnInject, L"Launch");
+                        }
+                    }
+                }
             }
             break;
         }
@@ -416,6 +466,7 @@ LRESULT CALLBACK WndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam) {
         }
         case WM_DESTROY: {
             KillTimer(hwnd, TIMER_AUTOINJECT);
+            KillTimer(hwnd, TIMER_UIUPDATE);
             RemoveTrayIcon();
             if (g_hFont) {
                 DeleteObject(g_hFont);
